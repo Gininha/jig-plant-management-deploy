@@ -4,19 +4,14 @@
 
 replicaCount: 1
 
-#image:
-#  registry: containers.jig-internet.ghe.com
-#  repository: production-plant-management
-#  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-#  tag: "latest"
-
 image:
-  repository: containers.jig-internet.ghe.com/jig-internet/service-name
-  tag: "1.0.0"
+  registry: containers.jig-internet.ghe.com
+  repository: production-plant-management
   pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
 
-imagePullSecrets: 
+imagePullSecrets:
   - name: jig-registry-secret
 nameOverride: ""
 fullnameOverride: ""

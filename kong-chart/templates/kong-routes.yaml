@@ -9,7 +9,7 @@ data:
     #!/bin/sh
     set -e
     
-    KONG_ADMIN_URL="http://localhost:8001"
+    KONG_ADMIN_URL="http://kong-kong-chart-admin:8001"
     
     echo "Waiting for Kong Admin API..."
     until curl -s ${KONG_ADMIN_URL}/status > /dev/null; do
