@@ -1,0 +1,57 @@
+# Keycloak Chart Values
+# Custom implementation without Bitnami dependencies
+
+replicaCount: 1
+
+image:
+  repository: quay.io/keycloak/keycloak
+  tag: "23.0"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+auth:
+  adminUser: admin
+  adminPassword: admin123
+
+hostname: keycloak.local
+proxy: edge
+
+postgresql:
+  host: postgresql
+  port: 5432
+  database: keycloak
+  username: keycloak
+  password: keycloak123
+
+livenessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: keycloak.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

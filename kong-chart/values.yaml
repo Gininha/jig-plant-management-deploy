@@ -1,0 +1,72 @@
+# Kong Gateway Chart Values
+# Custom implementation without external dependencies
+
+replicaCount: 1
+
+image:
+  repository: kong
+  tag: "3.5"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+proxy:
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8000
+  https:
+    enabled: true
+    servicePort: 8443
+
+postgresql:
+  host: postgresql
+  port: 5432
+  database: kong
+  username: kong
+  password: kong123
+
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Kong Routes Configuration
+routes:
+  enabled: true
+  services:
+    - name: plant-management
+      url: http://plant-management-production-plant-management:3000
+      path: /produccion
+      strip_path: false
+    - name: production-management
+      url: http://production-management-thetorre-produccion-production-management:3000
+      path: /produccion/production-management
+      strip_path: true
+    - name: statistics-management
+      url: http://statistics-management-thetorre-produccion-statistics-management:3000
+      path: /produccion/statistics-management
+      strip_path: true
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: kong.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

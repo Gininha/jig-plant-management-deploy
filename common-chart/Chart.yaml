@@ -1,0 +1,17 @@
+apiVersion: v2
+name: microservice-chart
+description: A generic Helm chart for microservices
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - microservice
+  - backend
+  - nodejs
+  - typescript
+home: https://jig-internet.ghe.com/JIG-INTERNET
+sources:
+  - https://jig-internet.ghe.com/JIG-INTERNET
+maintainers:
+  - name: JIG Internet Team
+    email: info@jig.es

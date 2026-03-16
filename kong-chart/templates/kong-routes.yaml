@@ -1,0 +1,66 @@
+{{- if .Values.routes.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kong-routes-config
+  namespace: {{ .Release.Namespace }}
+data:
+  configure-routes.sh: |-
+    #!/bin/sh
+    set -e
+    
+    KONG_ADMIN_URL="http://localhost:8001"
+    
+    echo "Waiting for Kong Admin API..."
+    until curl -s ${KONG_ADMIN_URL}/status > /dev/null; do
+      echo "Kong not ready, waiting..."
+      sleep 5
+    done
+    
+    echo "Kong is ready! Configuring routes..."
+    
+    # Production Management Service
+    curl -i -X POST ${KONG_ADMIN_URL}/services --data name=production-management --data url=http://production-management-thetorre-produccion-production-management.{{ .Release.Namespace }}.svc.cluster.local:3000 || true
+    curl -i -X POST ${KONG_ADMIN_URL}/services/production-management/routes --data name=production-management-route --data 'paths[]=/produccion/production-management' --data strip_path=false || true
+    
+    # Statistics Management Service  
+    curl -i -X POST ${KONG_ADMIN_URL}/services --data name=statistics-management --data url=http://statistics-management-thetorre-produccion-statistics-management.{{ .Release.Namespace }}.svc.cluster.local:3000 || true
+    curl -i -X POST ${KONG_ADMIN_URL}/services/statistics-management/routes --data name=statistics-management-route --data 'paths[]=/produccion/statistics-management' --data strip_path=false || true
+    
+    # Plant Management Service
+    curl -i -X POST ${KONG_ADMIN_URL}/services --data name=plant-management --data url=http://plant-management-production-plant-management.{{ .Release.Namespace }}.svc.cluster.local:3000 || true
+    curl -i -X POST ${KONG_ADMIN_URL}/services/plant-management/routes --data name=plant-management-route --data 'paths[]=/produccion' --data strip_path=false || true
+    
+    # CORS plugin
+    curl -i -X POST ${KONG_ADMIN_URL}/plugins --data name=cors --data config.origins=* --data config.methods=GET --data config.methods=POST --data config.methods=PUT --data config.methods=DELETE --data config.headers=Authorization --data config.credentials=true || true
+    
+    echo "Routes configured!"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kong-configure-routes
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      name: kong-configure-routes
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: configure-routes
+        image: curlimages/curl:latest
+        command: ["/bin/sh", "/scripts/configure-routes.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: scripts
+        configMap:
+          name: kong-routes-config
+          defaultMode: 0755
+{{- end -}}

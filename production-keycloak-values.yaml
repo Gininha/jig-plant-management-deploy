@@ -1,0 +1,63 @@
+# Keycloak - Production Values
+# For use in production Kubernetes clusters
+
+replicaCount: 2
+
+image:
+  repository: quay.io/keycloak/keycloak
+  tag: "23.0"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+auth:
+  adminUser: admin
+  # Set via --set auth.adminPassword=SECURE_PASSWORD
+
+postgresql:
+  host: postgresql
+  port: 5432
+  database: keycloak
+  username: postgres
+  # Set via --set postgresql.password=SECURE_PASSWORD
+
+hostname: keycloak.thetorre.example.com
+proxy: edge
+
+livenessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 30
+
+readinessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+  hosts:
+    - host: keycloak.thetorre.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: keycloak-tls
+      hosts:
+        - keycloak.thetorre.example.com

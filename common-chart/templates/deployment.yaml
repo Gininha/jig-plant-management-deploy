@@ -1,0 +1,249 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "microservice-chart.fullname" . }}
+  labels:
+    {{- include "microservice-chart.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "microservice-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "microservice-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "microservice-chart.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: {{ include "microservice-chart.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+          protocol: TCP
+        env:
+        # Load configuration from ConfigMap
+        - name: DEBUG
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: DEBUG
+        - name: AUTHENTICATION
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: AUTHENTICATION
+        - name: SCRIPT_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              name: {{ include "microservice-chart.fullname" . }}
+              key: SCRIPT_NAME
+        - name: SAVE_TIME_SERIES
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: SAVE_TIME_SERIES
+        - name: SOCKET_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: SOCKET_PATH
+        - name: DB_DIALECT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: DB_DIALECT
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: DB_NAME
+        - name: DB_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: DB_USERNAME
+        - name: IOT_UL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: IOT_UL_HOST
+        - name: IOT_UL_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: IOT_UL_PORT
+        - name: ORION_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: ORION_HOST
+        - name: ORION_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: ORION_PORT
+        - name: NOTIFICATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: NOTIFICATION_URL
+        - name: UMBRELLA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: UMBRELLA_HOST
+        - name: QUANTUMLEAP_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: QUANTUMLEAP_HOST
+        # Load secrets from Secret
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: db-password
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: jwt-secret
+        - name: UMBRELLA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "microservice-chart.fullname" . }}
+              key: umbrella-api-key
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe.httpGet | nindent 10 }}
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe.httpGet | nindent 10 }}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

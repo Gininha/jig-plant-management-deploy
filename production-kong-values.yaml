@@ -1,0 +1,77 @@
+# Kong Gateway - Production Values
+# For use in production Kubernetes clusters
+
+replicaCount: 2
+
+image:
+  repository: kong
+  tag: "3.5"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+proxy:
+  type: LoadBalancer
+  http:
+    enabled: true
+    servicePort: 80
+  https:
+    enabled: true
+    servicePort: 443
+
+postgresql:
+  host: postgresql
+  port: 5432
+  database: kong
+  username: postgres
+  # Set via --set postgresql.password=SECURE_PASSWORD
+
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+# Kong Routes Configuration
+routes:
+  enabled: true
+  services:
+    - name: plant-management
+      url: http://plant-management-production-plant-management:3000
+      path: /produccion
+      strip_path: false
+    - name: production-management
+      url: http://production-management-thetorre-produccion-production-management:3000
+      path: /produccion/production-management
+      strip_path: true
+    - name: statistics-management
+      url: http://statistics-management-thetorre-produccion-statistics-management:3000
+      path: /produccion/statistics-management
+      strip_path: true
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: api.thetorre.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: kong-tls
+      hosts:
+        - api.thetorre.example.com

@@ -1,0 +1,156 @@
+# Default values for production-plant-management.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+#image:
+#  registry: containers.jig-internet.ghe.com
+#  repository: production-plant-management
+#  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+#  tag: "latest"
+
+image:
+  repository: containers.jig-internet.ghe.com/jig-internet/service-name
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: 
+  - name: jig-registry-secret
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 3203
+  targetPort: 3203
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: plant-management.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: plant-management-tls
+  #    hosts:
+  #      - plant-management.local
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Application specific configuration
+config:
+  debug: "false"
+  authentication: "true"
+  scriptName: "start-production"
+  saveTimeSeries: "true"
+  socketPath: "/api/socket.io"
+
+# External service endpoints
+externalServices:
+  iotUlHost: "http://63.35.25.126"
+  iotUlPort: "4061"
+  orionHost: "http://63.35.25.126"
+  orionPort: "1026"
+  notificationUrl: "http://63.35.135.61:3434/api/notifications/"
+  umbrellaHost: "http://63.35.135.61:9559/api/v1"
+  quantumleapHost: "http://63.35.25.126:32773"
+
+# Database configuration
+database:
+  # Set to true to use external PostgreSQL database
+  external: true
+  host: "production-plant-management-postgres"
+  port: "5432"
+  name: "production_plm"
+  username: "desjig"
+  # Password should be provided via secrets
+
+# PostgreSQL subchart configuration (if not using external database)
+postgresql:
+  enabled: false
+  auth:
+    username: desjig
+    password: ""
+    database: production_plm
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Secrets - these should be overridden in a separate values file or via --set
+secrets:
+  # Database password (set via --set or in a secret)
+  dbPassword: ""
+  # JWT secret for authentication
+  jwtSecret: ""
+  # Umbrella API key
+  umbrellaApiKey: ""
+
+# Probes
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 3203
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 3203
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3

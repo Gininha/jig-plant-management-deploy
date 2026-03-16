@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-init
+  namespace: thetorre-local
+data:
+  init.sql: |
+    -- Create databases for all services
+    CREATE DATABASE IF NOT EXISTS plant_management;
+    CREATE DATABASE IF NOT EXISTS production_management;
+    CREATE DATABASE IF NOT EXISTS statistics_management;
+    CREATE DATABASE IF NOT EXISTS kong;
+    CREATE DATABASE IF NOT EXISTS keycloak;
+    
+    -- Create users (optional, can use postgres user)
+    -- CREATE USER kong WITH PASSWORD 'kong123';
+    -- GRANT ALL PRIVILEGES ON DATABASE kong TO kong;
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-secret
+  namespace: thetorre-local
+type: Opaque
+stringData:
+  postgres-password: postgres123
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-pvc
+  namespace: thetorre-local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  namespace: thetorre-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:16
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgresql-secret
+              key: postgres-password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgresql-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgresql-storage
+        persistentVolumeClaim:
+          claimName: postgresql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: thetorre-local
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgresql

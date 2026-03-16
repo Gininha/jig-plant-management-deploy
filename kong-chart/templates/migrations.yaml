@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kong-chart.fullname" . }}-migrations
+  labels:
+    {{- include "kong-chart.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        app: kong-migrations
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: kong-migrations
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["kong", "migrations", "bootstrap"]
+        env:
+        - name: KONG_DATABASE
+          value: postgres
+        - name: KONG_PG_HOST
+          value: {{ .Values.postgresql.host }}
+        - name: KONG_PG_PORT
+          value: {{ .Values.postgresql.port | quote }}
+        - name: KONG_PG_DATABASE
+          value: {{ .Values.postgresql.database }}
+        - name: KONG_PG_USER
+          value: {{ .Values.postgresql.username }}
+        - name: KONG_PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "kong-chart.fullname" . }}-secret
+              key: postgresql-password

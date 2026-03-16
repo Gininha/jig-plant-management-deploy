@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "plant-management-chart.fullname" . }}
+  labels:
+    {{- include "plant-management-chart.labels" . | nindent 4 }}
+data:
+  # Application configuration
+  DEBUG: {{ .Values.config.debug | quote }}
+  AUTHENTICATION: {{ .Values.config.authentication | quote }}
+  SCRIPT_NAME: {{ .Values.config.scriptName | quote }}
+  SAVE_TIME_SERIES: {{ .Values.config.saveTimeSeries | quote }}
+  SOCKET_PATH: {{ .Values.config.socketPath | quote }}
+  
+  # Database configuration
+  DB_DIALECT: "postgres"
+  DB_HOST: {{ .Values.database.host | quote }}
+  DB_PORT: {{ .Values.database.port | quote }}
+  DB_NAME: {{ .Values.database.name | quote }}
+  DB_USERNAME: {{ .Values.database.username | quote }}
+  
+  # External services
+  IOT_UL_HOST: {{ .Values.externalServices.iotUlHost | quote }}
+  IOT_UL_PORT: {{ .Values.externalServices.iotUlPort | quote }}
+  ORION_HOST: {{ .Values.externalServices.orionHost | quote }}
+  ORION_PORT: {{ .Values.externalServices.orionPort | quote }}
+  NOTIFICATION_URL: {{ .Values.externalServices.notificationUrl | quote }}
+  UMBRELLA_HOST: {{ .Values.externalServices.umbrellaHost | quote }}
+  QUANTUMLEAP_HOST: {{ .Values.externalServices.quantumleapHost | quote }}
